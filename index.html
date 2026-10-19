@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#176b55">
+  <meta name="description" content="An offline study tracker that turns completed concepts into virtual rewards.">
+  <title>Study Reward Wallet</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-mark" aria-hidden="true">₹</div>
+    <div><p class="eyebrow">YOUR PERSONAL PROGRESS WALLET</p><h1>Study Reward Wallet</h1></div>
+    <span id="offlineBadge" class="status-pill">● Ready</span>
+  </header>
+
+  <main class="container">
+    <section class="hero panel">
+      <div>
+        <p class="eyebrow">SMALL STEPS. REAL PROGRESS.BETTER LIFE</p>
+        <h2>Earn your rewards, one concept at a time.</h2>
+        <p class="muted">This is virtual motivation money—not real cash or a financial account.</p>
+      </div>
+      <div class="date-box"><label for="selectedDate">Study date</label><input id="selectedDate" type="date"></div>
+    </section>
+
+    <section class="stats-grid" aria-label="Daily summary">
+      <article class="stat-card earned"><span>Earned today</span><strong id="earnedTotal">₹0</strong><small>From completed concepts</small></article>
+      <article class="stat-card missed"><span>Paid Amount From Parents (rs. 400)</span><strong id="missedTotal">₹0</strong><small>Make this amount 0 so to completed daily minimum requirements</small></article>
+      <article class="stat-card net"><span>Net Earnings</span><strong id="netTotal">₹0</strong><small>Earned minus missed-goal value</small></article>
+      <article class="stat-card"><span>Concepts completed</span><strong id="completedTotal">0</strong><small id="goalProgress">Goal: 20 concepts</small></article>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading"><div><p class="eyebrow">TODAY'S PLAN</p><h2>Your four subjects</h2></div><span class="muted">Default goal: 5 concepts each</span></div>
+      <div id="subjectCards" class="subject-grid"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading"><div><p class="eyebrow">LOG A WIN</p><h2>Add a completed concept</h2></div></div>
+      <form id="conceptForm" class="form-grid">
+        <label>Subject
+          <select id="subjectInput" required>
+            <option>MERN Stack</option><option>System Command</option><option>MLT</option><option>BDM</option>
+          </select>
+        </label>
+        <label>Concept you completed
+          <input id="conceptName" maxlength="100" placeholder="e.g. HTML forms or Linux permissions" required>
+        </label>
+        <label>Difficulty
+          <select id="difficulty">
+            <option value="10">Easy — ₹10</option>
+            <option value="20" selected>Medium — ₹20</option>
+            <option value="30">Hard — ₹30</option>
+            <option value="custom">Custom reward</option>
+          </select>
+        </label>
+        <label id="customRewardWrap" class="hidden">Custom reward (₹)
+          <input id="customReward" type="number" min="0" max="100000" step="1" value="20">
+        </label>
+        <button class="button primary form-submit" type="submit">＋ Add reward</button>
+      </form>
+      <p class="hint">Tip: use the concept name to create a useful study history. You can change the reward based on how challenging the concept was.</p>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading"><div><p class="eyebrow">YOUR RECEIPT</p><h2>Concepts logged</h2></div><div class="button-row">
+          <button id="exportBtn" class="button secondary" type="button">Export history</button>
+          <button id="importBtn" class="button secondary" type="button" aria-describedby="importHelp">Import backup</button>
+          <input id="importFile" type="file" accept=".json,application/json" hidden>
+        </div></div>
+      <p id="importHelp" class="hint import-help">Moving to another device? Export history here, copy the .json file across, then choose Import backup there. Importing replaces the data saved on that device.</p>
+      <div id="importMessage" class="notice hidden" role="status" aria-live="polite"></div>
+      <div id="entriesList" class="entries-list"></div>
+      <p id="emptyState" class="empty-state">No concepts logged for this date yet. Your first small win starts here.</p>
+    </section>
+
+    <details class="panel settings-panel">
+      <summary><span><p class="eyebrow">MAKE IT YOURS</p><strong>Goals and missed-day rules</strong></span><span class="summary-note">Adjust anytime ▾</span></summary>
+      <div class="settings-grid">
+        <label>Daily concept goal per subject
+          <input id="goalInput" type="number" min="0" max="100" value="5">
+        </label>
+        <label>Virtual value missed per unfinished concept (₹)
+          <input id="penaltyInput" type="number" min="0" max="100000" step="1" value="10">
+        </label>
+        <button id="saveSettings" class="button primary" type="button">Save rules</button>
+      </div>
+      <p class="hint">“Missed-goal value” is only a motivational score. No money is taken from you. It is calculated as unfinished concepts × your chosen virtual value, capped at zero once you meet the goal.</p>
+    </details>
+
+    <section class="panel history-panel">
+      <div class="section-heading"><div><p class="eyebrow">ZOOM OUT</p><h2>Recent daily totals</h2></div></div>
+      <div id="historyList" class="history-list"></div>
+    </section>
+
+    <footer><p>Made for your learning journey. Your data stays in this browser on this device.</p><p class="muted">Install this app from your browser menu for quick access. Offline use works after the app has loaded once online.</p></footer>
+  </main>
+  <dialog id="importDialog" class="import-dialog" aria-labelledby="importDialogTitle" aria-describedby="importDialogWarning">
+    <form method="dialog">
+      <h2 id="importDialogTitle">Replace your saved data?</h2>
+      <p id="importDialogWarning" class="dialog-warning"></p>
+      <table class="compare-table">
+        <caption class="visually-hidden">Backup file compared with the data currently on this device</caption>
+        <thead><tr><th scope="col"></th><th scope="col">Backup file</th><th scope="col">This device now</th></tr></thead>
+        <tbody id="importCompareBody"></tbody>
+      </table>
+      <p class="hint">Tip: if this device has records you want to keep, press Cancel and use Export history first.</p>
+      <div class="dialog-actions">
+        <button class="button secondary" value="cancel" autofocus>Cancel</button>
+        <button class="button danger" value="replace">Replace with backup</button>
+      </div>
+    </form>
+  </dialog>
+  <div id="toast" role="status" aria-live="polite" class="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

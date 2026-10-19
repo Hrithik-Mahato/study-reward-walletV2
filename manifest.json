@@ -1,0 +1,18 @@
+{
+  "name": "Study Reward Wallet",
+  "short_name": "Study Wallet",
+  "description": "Track completed study concepts and earn virtual motivation money.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f7f4",
+  "theme_color": "#176b55",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
